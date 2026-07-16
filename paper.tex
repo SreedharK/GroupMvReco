@@ -1,110 +1,150 @@
-\documentclass[10pt,twocolumn,letterpaper]{article}
+%%
+%% Trade-Off Table — RecSys 2026 Demo Track Submission
+%%
+%% Uses the official ACM acmart template (sigconf, double-column).
+%% Page budget: 2 pages main text + 1 additional page for references
+%% and supplementary content (figures/tables/screenshots/repository).
+%%
+%% Compile with: pdflatex paper.tex → bibtex paper → pdflatex (×2)
+%%
 
-% Basic packages for formatting
-\usepackage{times}
-\usepackage{epsfig}
-\usepackage{graphicx}
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{hyperref}
+\documentclass[sigconf]{acmart}
+
+%% ── Remove ACM-specific running headers for submission ──────────
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\pagestyle{plain}
+
+%% ── Extra packages ──────────────────────────────────────────────
 \usepackage{booktabs}
+\usepackage{graphicx}
 
-% Adjust margins for typical double-column conference formats
-\usepackage[margin=1in]{geometry}
-
-\begin{document}
-
-%%%%%%%%% TITLE
+%% ── Metadata ────────────────────────────────────────────────────
 \title{Trade-Off Table: A Token-Economy Interface for Negotiating Group Movie Choices}
 
-\author{Author Name\\
-Institution\\
-{\tt\small author@email.com}
+\author{Author A}
+\affiliation{%
+  \institution{Institution}
+  \city{City}
+  \country{Country}
 }
+\email{authora@institution.edu}
+
+\author{Author B}
+\affiliation{%
+  \institution{Institution}
+  \city{City}
+  \country{Country}
+}
+\email{authorb@institution.edu}
+
+%% ════════════════════════════════════════════════════════════════
+%%  MAIN TEXT — PAGES 1 & 2
+%% ════════════════════════════════════════════════════════════════
+\begin{document}
+
+\begin{abstract}
+Choosing what a group should watch together is a negotiation, not an averaging problem, yet existing group recommenders hide the aggregation rule inside an opaque function that quietly decides whose preferences prevail. Trade-Off Table externalizes that rule into a scarce token economy: each participant receives a fixed budget of \emph{wish tokens} to boost films they want and a smaller number of \emph{veto tokens} to hard-block films they cannot tolerate, placing them directly on candidate posters displayed on a shared screen. The system recomputes a live shortlist as tokens are placed and moved, surfacing a Pareto-style consensus frontier that respects every veto while maximizing satisfied wishes. An adjustable fairness dial lets the group slide between a Utilitarian strategy (maximize total happiness) and a Rawlsian Least-Misery strategy (protect the least-satisfied member), re-sorting the shortlist in real time. Trade-Off Table is a working, in-person-demoable system delivered as an offline-first browser application with a live link and an accompanying video.
+\end{abstract}
 
 \maketitle
 
-%%%%%%%%% PAGE 1 & 2: MAIN TEXT
-\begin{abstract}
-Choosing what a group should watch together is a negotiation, not an averaging problem, yet existing group recommenders hide the aggregation rule inside an opaque function that quietly decides whose preferences prevail. Trade-Off Table externalizes that rule into a scarce token economy: each participant receives a fixed budget of wish tokens to boost films they want and a smaller number of veto tokens to hard-block films they cannot tolerate, placing them directly on candidate posters. The system recomputes a live shortlist as tokens are placed and moved, surfacing a Pareto-style consensus frontier that respects every veto while maximizing satisfied wishes. This is a working, in-person-demoable system delivered as a shared-surface tablet application. It targets the Demo track’s interaction-technique, group-recommender, and innovative-application categories, foregrounding an embodied metaphor that a group at the booth can physically play.
-\end{abstract}
-
 \section{Introduction and Motivation}
-The everyday question “what should we watch?” is deceptively hard because it is a social negotiation dressed up as a search problem. Most group recommenders resolve it through the tyranny of averaging (Utilitarian strategy), blending individual profiles into a single aggregate that satisfies no one strongly and quietly erases minority preferences, or through the tyranny of the loudest voice, where whoever holds the remote decides. Both failure modes share a root cause: the aggregation rule is invisible. Participants cannot see how their preferences are being combined, cannot express that some objections are absolute rather than merely mild, and cannot bargain. Furthermore, traditional systems suffer from the "cold start" group elicitation problem, relying on long-term historical profiles that rarely reflect the immediate, contextual mood of a group gathered around a TV.
+The everyday question ``what should we watch?'' is deceptively hard because it is a social negotiation dressed up as a search problem. Most group recommenders resolve it through the \emph{tyranny of averaging}~\cite{masthoff2011group}, blending individual profiles into a single Utilitarian aggregate that satisfies no one strongly and quietly erases minority preferences, or through the \emph{tyranny of the loudest voice}, where whoever holds the remote decides. Both failure modes share a root cause: the aggregation rule is invisible. Participants cannot see how their preferences are being combined, cannot express that some objections are absolute rather than merely mild, and cannot bargain. Furthermore, traditional systems suffer from the cold-start group-elicitation problem~\cite{jameson2007recommendation}, relying on long-term historical profiles that rarely reflect the immediate, contextual mood of a group gathered around a TV.
 
-Trade-Off Table makes the trade-off tangible. Scarcity is the mechanism: because each person has only a small budget of tokens, spending them forces honest priority-revelation. A participant cannot boost everything, so they must decide what they truly want, and a limited supply of veto tokens captures the hard constraints that averaging cannot represent, such as an absolute unwillingness to sit through horror or a three-hour runtime. The negotiation becomes explicit, legible, and playable rather than hidden behind a similarity score.
+Trade-Off Table makes the trade-off tangible. Scarcity is the mechanism: because each person has only a small budget of tokens, spending them forces honest priority-revelation. A participant cannot boost everything, so they must decide what they truly want, and a limited supply of veto tokens captures the hard constraints that averaging cannot represent---such as an absolute unwillingness to sit through horror or a three-hour runtime~\cite{chen2012critiquing}. The negotiation becomes explicit, legible, and playable rather than hidden behind a similarity score.
 
-This is a demonstration contribution because its value is embodied and immediate. At the poster booth, a small group can gather, spend and move tokens on candidate posters, and watch the shortlist recompute in front of them. The spectator-friendly nature of a live negotiation, with tokens visibly changing the outcome, makes the concept legible in a way no static description can convey.
+This is a demonstration contribution because its value is embodied and immediate. At the poster booth a small group can gather, spend and move tokens on candidate posters, and watch the shortlist recompute in front of them. The spectator-friendly nature of a live negotiation---with tokens visibly changing the outcome---makes the concept legible in a way no static description can convey.
 
 \section{System Overview}
-The system comprises three components. The first is the \textbf{Token Board} front-end: a grid of candidate film posters on which each participant acts. Every person receives a small fixed budget of wish tokens to boost films they want and a smaller number of veto tokens to hard-block films they refuse. Tokens are draggable on a tablet or tappable on a shared board, and their placement is immediately visible to everyone, so the group can see who is investing where and negotiate accordingly. (See Figure S1 on Page 3 for the UI).
+The system comprises three components (see Figure~\ref{fig:architecture} on page~3).
 
-The second component is a \textbf{Negotiation Engine} that interprets the token layout. Wish tokens act as weighted preference signals, contributing to a film’s combined support, while veto tokens act as hard filters that remove a film from contention regardless of how many wishes it has attracted. The engine computes a live shortlist that maximizes total satisfied wishes subject to respecting every veto.
+\textbf{Token Board.}
+A grid of 12 candidate film posters drawn from a curated MovieLens subset is displayed on a shared screen. Each of three participants receives a personal tray containing three color-coded \emph{wish tokens} ($\bigstar$) and one \emph{veto token} ($\times$). Tokens are draggable onto any film poster via HTML5 drag-and-drop, and their placement is immediately visible to all participants, so the group can see who is investing where and negotiate accordingly.
 
-The third component is a \textbf{Consensus Panel} presentation that displays the live shortlist alongside a plain-language line explaining why each film survived. Crucially, the aggregation rule is exposed and adjustable through a dial that slides between “maximize total happiness” (a Utilitarian strategy favoring films with the greatest summed wish weight) and “protect the least-satisfied member” (a Rawlsian/Least Misery strategy favoring films that avoid leaving anyone behind). Moving this dial re-sorts the shortlist live, letting a group literally watch the fairness philosophy change the outcome.
+\textbf{Negotiation Engine.}
+Wish tokens act as weighted preference signals, contributing to a film's combined support score. Veto tokens act as hard filters that remove a film from contention regardless of accumulated wishes. The engine computes a live shortlist by maximizing total satisfied wishes subject to respecting every veto. Formally, the composite score for a non-vetoed film~$f$ is:
+\[
+  S(f) = (1-\alpha)\;\underbrace{\sum_{i} w_i(f)}_{\text{Utilitarian}}
+       + \;\alpha\;\underbrace{2\,|\{i : w_i(f)>0\}|}_{\text{Rawlsian}}
+\]
+where $w_i(f)$ is the wish-token weight placed by participant~$i$, and $\alpha\in[0,1]$ is controlled by the fairness dial~\cite{baltrunas2010group}.
+
+\textbf{Consensus Panel.}
+A ranked shortlist is displayed alongside a plain-language rationale for each surviving film (e.g., ``supported by 2 members with 3 total wishes''). A glassmorphic slider dial allows the group to adjust~$\alpha$ live: sliding left favors the Utilitarian objective (maximize total happiness), while sliding right favors the Rawlsian Least-Misery objective (protect the least-satisfied member)~\cite{masthoff2011group}. Moving the dial re-sorts the shortlist instantly, letting the group watch the fairness philosophy change the outcome.
 
 \section{Interaction Walkthrough}
-Consider a concrete three-person session. Two participants each drop a wish token on a well-reviewed thriller, pushing it to the top of the shortlist as a clear front-runner. The third participant, who cannot tolerate that genre, spends a veto token on it, and the film immediately drops out of contention despite its strong wish weight. The Consensus Panel updates to explain that a veto now excludes it. The shortlist re-sorts live, promoting a comedy that had been sitting second.
+Consider a concrete three-person session. Two participants each drop a wish token on \emph{The Dark Knight}, pushing it to the top of the shortlist as a clear front-runner. The third participant, who cannot tolerate action films, spends a veto token on it, and the film immediately drops out of contention despite its strong wish weight---a bold red \textsc{vetoed} overlay appears and the Consensus Panel re-sorts live, promoting \emph{Forrest Gump} to first place.
 
-A tie then emerges between two remaining candidates with equal combined support. One participant reallocates a wish token from a film they had boosted earlier onto one of the tied options, breaking the deadlock, and the shortlist re-sorts again to reflect the new balance. The compelling live moment is precisely this visible re-computation: each token movement produces an interpretable, immediate change in the shortlist, so onlookers understand the negotiation as it unfolds.
+A tie then emerges between two remaining candidates with equal combined support. One participant reallocates a wish token from a film they had boosted earlier onto one of the tied options, breaking the deadlock, and the shortlist re-sorts again. The compelling live moment is precisely this visible re-computation: each token movement produces an interpretable, immediate change, so onlookers understand the negotiation as it unfolds.
 
-\sectionsection{Implementation and Demo Logistics}
-The front-end is a lightweight web app built using React/Vanilla JS that runs on a shared tablet at the booth or is projected onto a larger board. The Negotiation Engine operates over a small pre-computed candidate set with a fast solver, so recomputation is effectively instant as tokens move, and no login is required so that booth visitors can begin negotiating immediately.
+\section{Implementation and Demo Logistics}
+The front-end is a lightweight, \textbf{offline-first} web application built using Vanilla JavaScript, HTML, and CSS---no framework, no backend server, no login required. It employs a dark-mode glassmorphism aesthetic with smooth gradient film backgrounds and color-coded participant tokens (teal, yellow, pink). The entire Negotiation Engine runs client-side over a pre-computed candidate set, so recomputation is effectively instant as tokens are moved.
 
-A live, browser-accessible instance will be provided via the anonymized demo URL supplied in the submission portal. If a public link cannot be exposed for any reason, the system runs fully offline as a fallback so that unreliable conference wifi does not interrupt the live demonstration.
+A live, browser-accessible instance is provided at the anonymized demo URL supplied in the submission portal, and a two-minute video walkthrough of a live three-person negotiation accompanies this submission. The system also runs fully offline as a fallback---opening the \texttt{index.html} file in any modern browser is sufficient---ensuring that unreliable conference Wi-Fi does not interrupt the live demonstration.
 
 \section{Innovation, Impact, and Limitations}
-The novelty of Trade-Off Table lies in its embodied scarce-token negotiation, which externalizes the group-aggregation rule and makes it tunable through the visible fairness dial. Rather than hiding whose preferences prevail inside a scoring function, the system turns aggregation into a playable, spectator-friendly economy that a group performs together.
+The novelty of Trade-Off Table lies in its embodied scarce-token negotiation, which externalizes the group-aggregation rule and makes it tunable through the visible fairness dial~\cite{tintarev2012evaluating}. Rather than hiding whose preferences prevail inside a scoring function, the system turns aggregation into a playable, spectator-friendly economy.
 
-For industry attendees the impact framing is direct: the interface reduces the browsing-paralysis and post-choice resentment that plague shared-account streaming, where a single household aggregate rarely reflects who is actually on the couch tonight.
+For industry attendees, the interface reduces the browsing-paralysis and post-choice resentment that plague shared-account streaming, where a single household aggregate rarely reflects who is actually on the couch tonight.
 
-Initial formative testing with three groups (N=9) indicated that participants found the veto tokens highly empowering, and the visible re-sorting provoked active, good-natured bargaining rather than passive frustration. Several limitations remain. Token budgets need tuning, since too few tokens flatten expression and too many dilute scarcity’s honesty-forcing effect. Strategic token spending is possible, where a participant games the layout to extract concessions. Scaling beyond small groups is an open question, as a large board may become cluttered. We warmly invite booth visitors to try the system and give feedback, in the spirit of the Demo track’s blend of academia and industry.
+Initial formative testing with three groups ($N{=}9$) indicated that participants found the veto tokens highly empowering and that the visible re-sorting provoked active, good-natured bargaining rather than passive frustration. Limitations remain: token budgets need tuning, strategic token spending is possible, and scaling beyond small groups ($>$5) is an open question. We warmly invite booth visitors to try the system and give feedback.
 
+%% ════════════════════════════════════════════════════════════════
+%%  PAGE 3 — REFERENCES + SUPPLEMENTARY CONTENT
+%% ════════════════════════════════════════════════════════════════
 \clearpage
-%%%%%%%%% PAGE 3: REFERENCES AND SUPPLEMENTARY ONLY
-\section*{References}
-\noindent [1] J. Masthoff. 2011. Group Recommender Systems: Combining Individual Models. In Recommender Systems Handbook.
 
-\noindent [2] A. Jameson and B. Smyth. 2007. Recommendation to Groups. In The Adaptive Web.
-
-\noindent [3] L. Chen and P. Pu. 2012. Critiquing-Based Recommenders: Survey and Emerging Trends. User Modeling and User-Adapted Interaction 22, 1-2.
-
-\noindent [4] N. Tintarev and J. Masthoff. 2012. Evaluating the Effectiveness of Explanations for Recommender Systems. User Modeling and User-Adapted Interaction 22, 4-5.
-
-\noindent [5] L. Baltrunas, T. Makcinskas, and F. Ricci. 2010. Group Recommendations with Rank Aggregation and Collaborative Filtering. In Proceedings of the ACM Conference on Recommender Systems.
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
 
 \section*{Supplementary Content}
+\emph{This section contains supplementary figures, tables, and resource descriptions and does not count toward the two-page main-text limit.}
 
 \subsection*{Comparison of Group-Decision Modes}
 
 \begin{table}[h]
 \centering
+\small
 \begin{tabular}{lccc}
 \toprule
-\textbf{Decision Mode} & \textbf{Reveals Priorities} & \textbf{Hard Constraints} & \textbf{Demo Legibility} \\
+\textbf{Decision Mode} & \textbf{Reveals} & \textbf{Hard} & \textbf{Demo} \\
+                        & \textbf{Priorities} & \textbf{Constraints} & \textbf{Legibility} \\
 \midrule
-Majority vote & Weak & No & Medium \\
-Averaged preferences & Weak & No & Low \\
-Turn-taking / rotation & Medium & No & Medium \\
-\textbf{Trade-Off Table} & \textbf{Strong} & \textbf{Yes} & \textbf{High} \\
+Majority vote           & Weak   & No  & Medium \\
+Averaged preferences    & Weak   & No  & Low    \\
+Turn-taking / rotation  & Medium & No  & Medium \\
+\textbf{Trade-Off Table}& \textbf{Strong} & \textbf{Yes} & \textbf{High} \\
 \bottomrule
 \end{tabular}
-\caption{Comparison of Trade-Off Table relative to conventional group-decision approaches.}
+\caption{Comparison of Trade-Off Table vs.\ conventional group-decision approaches.}
 \label{tab:comparison}
 \end{table}
 
-\subsection*{Supplementary Figures}
+\subsection*{System Screenshots}
 
-\noindent \textbf{Figure S1} — The Token Board interface, showing the poster grid of candidate films, the per-person wish and veto token trays, and the aggregation-rule dial that slides between maximizing total happiness and protecting the least-satisfied member. \textit{(Insert Mockup/Screenshot Here)}
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.95\columnwidth}{\centering\vspace{2em}\textit{Screenshot: Token Board interface showing the 12-film grid with gradient backgrounds, three color-coded participant trays (teal / yellow / pink) each holding 3 wish ($\bigstar$) and 1 veto ($\times$) tokens, and the glassmorphic fairness dial in the top-right header.}\vspace{2em}}}
+\caption{The Token Board front-end. Films are displayed as draggable poster cards; participant trays sit at the bottom; the fairness dial (Utilitarian $\leftrightarrow$ Rawlsian) is top-right.}
+\label{fig:architecture}
+\end{figure}
 
-\vspace{1em}
-\noindent \textbf{Figure S2} — The Consensus Panel shortlist re-sorting across two token allocations, presented side by side to illustrate how the recommended shortlist shifts as a veto is added and a wish token is reallocated. \textit{(Insert Mockup/Screenshot Here)}
+\begin{figure}[h]
+\centering
+\fbox{\parbox{0.95\columnwidth}{\centering\vspace{2em}\textit{Screenshot: Consensus Panel showing ranked shortlist with scores, plain-text rationale per film (e.g., ``Supported by 2 members with 3 total wishes''), and a VETOED overlay on a removed film.}\vspace{2em}}}
+\caption{The Consensus Panel re-sorting after a veto is applied. The vetoed film shows a red overlay; the shortlist updates instantly.}
+\label{fig:consensus}
+\end{figure}
 
-\subsection*{External Repository and Video Links}
+\subsection*{Video and Live Demo}
 
-\noindent \textbf{Video Walkthrough:} A two-minute screen recording of a live three-person negotiation, in which tokens are moved and the shortlist recomputes in real time, is provided as supplementary material through the submission system.
+\noindent\textbf{Video:} A two-minute screen recording of a live three-person negotiation---in which tokens are dragged onto films, a veto removes a front-runner, and the fairness dial is adjusted---is provided as supplementary material via the submission system.
 
-\vspace{1em}
-\noindent \textbf{Live System \& Source Code:} An anonymized public build together with the source will be made available for reviewers to interact with, provided through the submission portal.
+\vspace{0.5em}
+\noindent\textbf{Live system:} A browser-accessible instance of the system is available at: \texttt{[anonymized URL provided in submission portal]}. The codebase is pure Vanilla JS/HTML/CSS and runs fully offline; reviewers may also download and open \texttt{index.html} directly.
+
+\vspace{0.5em}
+\noindent\textbf{Source code:} The full source repository will be made available alongside the demo link through the submission portal.
 
 \end{document}
